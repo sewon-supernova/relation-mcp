@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial public release.
-- MCP server (stdio transport) exposing 9 tools covering ticket triage,
-  internal records/comments, address-book lookup, and reference data
-  (labels, users).
+- MCP server (stdio transport) exposing 11 tools covering ticket triage,
+  customer-facing mail reply, internal records/comments, address-book
+  lookup, and reference data (mail accounts, labels, users).
+- `reply_mail` tool with a `confirm_send: true` interlock to prevent
+  accidental customer emails during agent tool chaining.
 - Token-bucket rate limiter sized for the 60 req/min Re:lation tenant cap.
 - Typed errors: `RelationApiError`, `RelationAuthError`, `RelationRateLimitError`.
 - Zod-based input validation and config parsing.
-- Vitest unit tests for config, client, and rate limiter.
+- Vitest unit tests for config, client, rate limiter, and mail tools.
 - GitHub Actions CI (typecheck + test + build) and npm publish workflow.

@@ -12,6 +12,8 @@ A [Model Context Protocol](https://modelcontextprotocol.io) server for **[Re:lat
 
 - `search_tickets` — filter by status, assignee, labels, free-text query
 - `get_ticket` / `update_ticket` — fetch detail, change status/assignee/labels
+- `reply_mail` — customer-facing email reply, guarded by a `confirm_send: true` interlock
+- `list_mail_accounts` — discover the `mail_account_id` needed for `reply_mail`
 - `create_record` — post an internal 応対メモ (not visible to the customer)
 - `create_comment` — post a team comment on a ticket
 - `search_customers` / `get_customer` — address-book lookup
@@ -19,7 +21,9 @@ A [Model Context Protocol](https://modelcontextprotocol.io) server for **[Re:lat
 - Built-in token-bucket rate limiter (stays under the 60 req/min tenant limit)
 - Typed errors (`RelationApiError`, `RelationAuthError`, `RelationRateLimitError`)
 
-**Not included by design (v0.1):** customer-facing mail send / reply. Re:lation replies are high-stakes — this server is read + internal-write only for now. See [Roadmap](#roadmap).
+### Safety note on `reply_mail`
+
+`reply_mail` sends a real email to the customer on the ticket. To keep agents from accidentally firing it during tool chaining, the tool requires a `confirm_send: true` parameter — if missing or false, the call is rejected before hitting the Re:lation API. Use it deliberately.
 
 ## Install
 
@@ -74,6 +78,8 @@ All tools accept an optional `message_box_id` to override the default for a sing
 | `search_tickets` | `POST /tickets/search` — status, assignee, label, color, free text |
 | `get_ticket` | `GET /tickets/{id}` |
 | `update_ticket` | `PUT /tickets/{id}` — status, assignee, labels, color, pending reason |
+| `reply_mail` | `POST /mails/reply` — customer-facing reply (requires `confirm_send: true`) |
+| `list_mail_accounts` | `GET /mail_accounts` — lookup `mail_account_id` |
 | `create_record` | `POST /records` — internal 応対メモ |
 | `create_comment` | `POST /comments` — internal team comment |
 | `search_customers` | `POST /customers/search` — address-book search |
@@ -102,7 +108,6 @@ node dist/index.js     # speaks MCP over stdio
 
 ## Roadmap
 
-- [ ] `reply_mail` (customer-facing) — off by default, opt-in via env flag
 - [ ] `list_message_boxes`
 - [ ] `list_pending_reasons` / `list_case_categories`
 - [ ] Pagination helpers (auto-iterate `page`)
